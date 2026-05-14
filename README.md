@@ -8,7 +8,30 @@
 [![Linux](https://img.shields.io/badge/Linux-Wayland%20%26%20X11-blue)]()
 [![Python](https://img.shields.io/badge/Python-3.10+-blue)]()
 
-## Install (Ubuntu / Debian / Pop!_OS)
+## Install
+
+### Option A — Direct `.deb` download (Ubuntu / Debian / Pop!_OS)
+
+```bash
+wget https://github.com/yetesfa/yaz/releases/latest/download/yaz_0.1.0_all.deb
+sudo apt install ./yaz_0.1.0_all.deb
+```
+
+### Option B — `apt install` from PPA *(once published)*
+
+```bash
+sudo add-apt-repository ppa:yetesfa/yaz
+sudo apt update
+sudo apt install yaz
+```
+
+### Option C — Snap (Ubuntu App Center)
+
+```bash
+sudo snap install yaz
+```
+
+### Option D — From source
 
 ```bash
 git clone https://github.com/yetesfa/yaz.git
@@ -16,16 +39,14 @@ cd yaz
 ./install.sh
 ```
 
-That's it. Run with `yaz` or click **Yaz** in your apps grid.
+The installer takes care of `python3-venv`, `python3-gi`,
+`gnome-screenshot`, `wl-clipboard`, creates `.venv/` with `PyQt6`,
+symlinks `yaz` to `~/.local/bin/yaz`, and registers a `.desktop` entry.
 
-The installer:
-- installs `python3-venv`, `python3-gi`, `gnome-screenshot`, `wl-clipboard` via apt (one password prompt)
-- creates `.venv/` inside the repo with `PyQt6` (no system Python pollution)
-- symlinks `yaz` to `~/.local/bin/yaz`
-- registers a `.desktop` entry with quick-action menu items
+Run with `yaz` or click **Yaz** in your apps grid.
 
-To uninstall: delete the repo folder, `~/.local/bin/yaz`, and
-`~/.local/share/applications/yaz.desktop`.
+See [`PACKAGING.md`](PACKAGING.md) for how each install method is
+built and published.
 
 ## Features
 

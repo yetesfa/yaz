@@ -1,0 +1,75 @@
+name: yaz
+title: Yaz
+version: '0.1.0'
+summary: Wayland-native screenshot and annotation tool
+description: |
+  Yaz captures and annotates screenshots on Linux, designed to work
+  reliably on GNOME Wayland (Ubuntu 24.04+) where Flameshot, grim and
+  other wlroots-only tools don't work.
+
+  Features region/full-screen/per-monitor capture, delayed capture for
+  hover screenshots, arrow/rectangle/ellipse/pen/highlight/text/blur
+  annotations, full undo/redo, crop, and a global-shortcut wizard.
+
+  "Yaz" is Amharic for "grab it". Built by Yetesfa Alemayehu.
+
+grade: stable
+confinement: strict
+base: core24
+
+# Show on amd64 + arm64 (covers Raspberry Pi / Apple Silicon Linux too)
+platforms:
+  amd64:
+  arm64:
+
+apps:
+  yaz:
+    command: bin/yaz
+    extensions: [gnome]
+    plugs:
+      - home                  # to save screenshots to ~/Pictures
+      - desktop
+      - desktop-legacy
+      - wayland
+      - x11
+      - screen-inhibit-control
+      - dot-config-yaz        # snap's wrapped config dir
+      - removable-media
+    environment:
+      # Make portal calls find the host's xdg-desktop-portal
+      QT_QPA_PLATFORM: wayland;xcb
+
+plugs:
+  dot-config-yaz:
+    interface: personal-files
+    write: [$HOME/.config/Yaz]
+
+parts:
+  yaz:
+    plugin: python
+    source: .
+    build-packages:
+      - python3-dev
+    stage-packages:
+      - python3-pyqt6
+      - python3-gi
+      - gir1.2-glib-2.0
+      - wl-clipboard
+    override-build: |
+      craftctl default
+      # Install the launcher + yaz.py into snap's bin/lib layout.
+      install -Dm 0755 "${CRAFT_PROJECT_DIR}/yaz" "${CRAFT_PART_INSTALL}/bin/yaz-launcher"
+      install -Dm 0644 "${CRAFT_PROJECT_DIR}/yaz.py" "${CRAFT_PART_INSTALL}/lib/yaz/yaz.py"
+      cat > "${CRAFT_PART_INSTALL}/bin/yaz" <<'EOF'
+      #!/bin/sh
+      exec "$SNAP/usr/bin/python3" "$SNAP/lib/yaz/yaz.py" "$@"
+      EOF
+      chmod +x "${CRAFT_PART_INSTALL}/bin/yaz"
+      # Desktop file with snap-relative paths.
+      install -d "${CRAFT_PART_INSTALL}/meta/gui"
+      sed -e "s|@PREFIX@/yaz|yaz|g" \
+          "${CRAFT_PROJECT_DIR}/yaz.desktop.in" \
+        > "${CRAFT_PART_INSTALL}/meta/gui/yaz.desktop"
+    python-requirements: []
+    python-packages:
+      - PyQt6>=6.5

@@ -1,0 +1,30 @@
+Source: yaz
+Section: graphics
+Priority: optional
+Maintainer: Yetesfa Alemayehu <noreply@example.com>
+Build-Depends: debhelper-compat (= 13), dh-python, python3-all, python3-setuptools
+Standards-Version: 4.6.2
+Homepage: https://github.com/yetesfa/yaz
+Vcs-Browser: https://github.com/yetesfa/yaz
+Vcs-Git: https://github.com/yetesfa/yaz.git
+Rules-Requires-Root: no
+
+Package: yaz
+Architecture: all
+Depends: ${python3:Depends}, ${misc:Depends},
+         python3 (>= 3.10),
+         python3-pyqt6,
+         python3-gi,
+         gnome-screenshot,
+         wl-clipboard
+Recommends: grim, slurp
+Description: Wayland-native screenshot and annotation tool
+ Yaz captures and annotates screenshots on Linux. Designed for GNOME
+ Wayland (Ubuntu 24.04+) where Flameshot, grim and other wlroots-only
+ tools don't work.
+ .
+ Features region/full-screen/per-monitor capture, delayed capture (for
+ hover screenshots), arrow/rectangle/ellipse/pen/highlight/text/blur
+ annotations, undo/redo, crop, and a global keyboard-shortcut wizard.
+ .
+ "Yaz" is Amharic for "grab it". Built by Yetesfa Alemayehu.

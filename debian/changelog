@@ -1,0 +1,12 @@
+yaz (0.1.0-1) noble; urgency=medium
+
+  * Initial release.
+  * Wayland-native screenshot capture (gnome-screenshot / grim / portal).
+  * Annotation editor: rect, ellipse, arrow, line, pen, highlight, text, blur.
+  * Full undo/redo for add, delete, move, crop.
+  * Live property edits (color/width on selected items).
+  * Delayed capture (3/5/10s) for hover screenshots.
+  * Multi-monitor aware with correct fractional-scaling crop math.
+  * Global keyboard-shortcut setup via gsettings.
+
+ -- Yetesfa Alemayehu <noreply@example.com>  Thu, 14 May 2026 17:00:00 +0300

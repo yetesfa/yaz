@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+# Minimal debhelper rules — just copies files into the right /usr/* locations.
+
+export DEB_BUILD_OPTIONS = nocheck
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	# Install yaz.py into /usr/lib/yaz/
+	install -d $(CURDIR)/debian/yaz/usr/lib/yaz
+	install -m 0644 yaz.py $(CURDIR)/debian/yaz/usr/lib/yaz/yaz.py
+
+	# Install launcher into /usr/bin/yaz
+	install -d $(CURDIR)/debian/yaz/usr/bin
+	printf '#!/bin/sh\nexec /usr/bin/python3 /usr/lib/yaz/yaz.py "$$@"\n' \
+	    > $(CURDIR)/debian/yaz/usr/bin/yaz
+	chmod 0755 $(CURDIR)/debian/yaz/usr/bin/yaz
+
+	# Install desktop file
+	install -d $(CURDIR)/debian/yaz/usr/share/applications
+	sed 's|@PREFIX@/yaz|/usr/bin/yaz|g' yaz.desktop.in \
+	    > $(CURDIR)/debian/yaz/usr/share/applications/yaz.desktop
