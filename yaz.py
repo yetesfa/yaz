@@ -22,8 +22,10 @@ CLI:
     yaz --open FILE     open an existing image for annotation
     yaz --delay N       wait N seconds before capturing
 
-Developed by Yetesfa Alemayehu — https://www.linkedin.com/in/yetesfa-alemayehu
-Made in Addis Ababa. MIT license.
+Source:     https://github.com/yetesfa/yaz
+Issues:     https://github.com/yetesfa/yaz/issues
+Developer:  Yetesfa Alemayehu — https://www.linkedin.com/in/yetesfa-alemayehu
+License:    MIT — Made in Addis Ababa.
 """
 from __future__ import annotations
 
@@ -2056,9 +2058,12 @@ def run_app(initial_image: Path | None, autostart_capture: str | None,
                 "<p><b>Developed by Yetesfa Alemayehu</b><br>"
                 "<a href='https://www.linkedin.com/in/yetesfa-alemayehu' "
                 "style='color:#3a86ff;'>linkedin.com/in/yetesfa-alemayehu</a></p>"
+                "<p><a href='https://github.com/yetesfa/yaz' "
+                "style='color:#3a86ff;'>github.com/yetesfa/yaz</a>"
+                " · <a href='https://github.com/yetesfa/yaz/issues' "
+                "style='color:#3a86ff;'>Report a bug</a></p>"
                 "<p>Made in Addis Ababa &middot; MIT license</p>"
             )
-            # Make the LinkedIn link clickable.
             for lbl in mbox.findChildren(qt["QLabel"]):
                 lbl.setOpenExternalLinks(True)
                 lbl.setTextInteractionFlags(
@@ -2233,6 +2238,9 @@ def run_app(initial_image: Path | None, autostart_capture: str | None,
                 "password prompt.</p>"
                 "<p>Or run this in a terminal:<br>"
                 "<code>sudo apt install gnome-screenshot</code></p>"
+                "<p>Still stuck? Open an issue at "
+                "<a href='https://github.com/yetesfa/yaz/issues'>"
+                "github.com/yetesfa/yaz/issues</a>.</p>"
             )
             mbox.setDetailedText(f"{type(ex).__name__}: {ex}")
             install = mbox.addButton("Install Now", QMessageBox.ButtonRole.AcceptRole)

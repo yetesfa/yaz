@@ -38,8 +38,7 @@ To uninstall: `sudo apt remove yaz`.
 Users then install with:
 
 ```bash
-# replace URL with your release asset
-wget https://github.com/<you>/yaz/releases/download/v0.1.0/yaz_0.1.0_all.deb
+wget https://github.com/yetesfa/yaz/releases/download/v0.1.0/yaz_0.1.0_all.deb
 sudo apt install ./yaz_0.1.0_all.deb
 ```
 
@@ -80,8 +79,8 @@ sudo apt install yaz
 4. On <https://launchpad.net/~yetesfa/+editpgpkeys>, paste the fingerprint
    from `gpg --fingerprint <KEYID>` and confirm via the email Launchpad sends.
 
-5. **Create a PPA** on Launchpad: visit `https://launchpad.net/~<your-user>` →
-   *Create a new PPA*. Call it `yaz`.
+5. **Create a PPA** on Launchpad: visit
+   <https://launchpad.net/~yetesfa> → *Create a new PPA*. Call it `yaz`.
 
 6. **Install build tools locally**:
 
@@ -102,14 +101,14 @@ debuild -S -sa
 ls ../yaz_0.1.0*
 
 # 3. Upload to your PPA
-dput ppa:<your-launchpad-user>/yaz ../yaz_0.1.0_source.changes
+dput ppa:yetesfa/yaz ../yaz_0.1.0_source.changes
 ```
 
 Launchpad will email you when the build succeeds (≈10–30 min). After that,
 anyone can:
 
 ```bash
-sudo add-apt-repository ppa:<your-launchpad-user>/yaz
+sudo add-apt-repository ppa:yetesfa/yaz
 sudo apt update
 sudo apt install yaz
 ```

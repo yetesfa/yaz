@@ -383,8 +383,20 @@ cd yaz
 .venv/bin/python yaz.py
 ```
 
-For anything non-trivial, please open an issue first so we can align
-on the approach before you write code.
+For anything non-trivial, please open an issue first at
+<https://github.com/yetesfa/yaz/issues> so we can align on the approach
+before you write code.
+
+### Reporting bugs
+
+If something breaks, please open an issue with:
+
+- Your distro + version (`lsb_release -d`)
+- Display server (`echo $XDG_SESSION_TYPE`)
+- Desktop environment (`echo $XDG_CURRENT_DESKTOP`)
+- The output of `yaz` from a terminal when the bug happens
+
+Issue tracker: <https://github.com/yetesfa/yaz/issues>
 
 ---
 
