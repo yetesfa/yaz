@@ -1,0 +1,24 @@
+[Desktop Entry]
+Type=Application
+Name=Yaz
+GenericName=Screenshot Annotator
+Comment=Wayland-native screenshot capture and annotation (ያዝ — "grab it" in Amharic)
+Exec=@PREFIX@/yaz
+Terminal=false
+Categories=Graphics;Utility;
+Keywords=screenshot;capture;annotate;wayland;yaz;
+StartupNotify=true
+Icon=applets-screenshooter
+Actions=Full;Region3s;Region5s;
+
+[Desktop Action Full]
+Name=Capture full screen
+Exec=@PREFIX@/yaz --full
+
+[Desktop Action Region3s]
+Name=Capture region (3-second delay)
+Exec=@PREFIX@/yaz --capture --delay 3
+
+[Desktop Action Region5s]
+Name=Capture region (5-second delay)
+Exec=@PREFIX@/yaz --capture --delay 5
