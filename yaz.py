@@ -178,8 +178,90 @@ def capture_via_portal(interactive: bool = True) -> Path:
     return Path(unquote(urlparse(uri).path))
 
 
+def capture_region_native() -> Path:
+    """Interactive region capture using the OS-native area selector.
+
+    Unlike ``capture_full_screen()`` + the in-app picker, this lets the user
+    drag a selection on the *live* screen before any capture is taken — the
+    standard behaviour most screenshot apps offer. Returns the path to the
+    already-cropped PNG. Raises :class:`CaptureCancelled` if the user
+    dismisses the selector, or :class:`RuntimeError` if no native backend is
+    available."""
+    last_error: Exception | None = None
+
+    if shutil.which("gnome-screenshot"):
+        try:
+            return _capture_region_with_gnome_screenshot()
+        except CaptureCancelled:
+            raise
+        except Exception as ex:  # noqa: BLE001
+            last_error = ex
+
+    if shutil.which("slurp") and shutil.which("grim"):
+        try:
+            return _capture_region_with_grim_slurp()
+        except CaptureCancelled:
+            raise
+        except Exception as ex:  # noqa: BLE001
+            last_error = ex
+
+    raise RuntimeError(
+        "No interactive region backend available. Install gnome-screenshot:\n"
+        "    sudo apt install gnome-screenshot\n"
+        f"(Last backend error: {last_error})"
+    )
+
+
+def _capture_region_with_gnome_screenshot() -> Path:
+    """``gnome-screenshot -a`` opens a live drag-to-select overlay and saves
+    only the selected region."""
+    fd, name = tempfile.mkstemp(prefix="yaz-region-", suffix=".png")
+    os.close(fd)
+    out = Path(name)
+    # Long timeout — the user is framing the shot and may take their time.
+    res = subprocess.run(
+        ["gnome-screenshot", "-a", "-f", str(out)],
+        capture_output=True, timeout=600, text=True,
+    )
+    if res.returncode != 0:
+        out.unlink(missing_ok=True)
+        raise RuntimeError(
+            f"gnome-screenshot -a failed (rc={res.returncode}): "
+            f"{res.stderr.strip()}"
+        )
+    # gnome-screenshot exits 0 even when the user cancels — detect that by
+    # the absent / empty output file.
+    if not out.exists() or out.stat().st_size == 0:
+        out.unlink(missing_ok=True)
+        raise CaptureCancelled()
+    return out
+
+
+def _capture_region_with_grim_slurp() -> Path:
+    """``slurp`` prints a region geometry; ``grim`` then captures just that."""
+    slurp = subprocess.run(
+        ["slurp"], capture_output=True, timeout=600, text=True,
+    )
+    geom = slurp.stdout.strip()
+    if slurp.returncode != 0 or not geom:
+        raise CaptureCancelled()
+    fd, name = tempfile.mkstemp(prefix="yaz-region-", suffix=".png")
+    os.close(fd)
+    out = Path(name)
+    res = subprocess.run(
+        ["grim", "-g", geom, str(out)],
+        capture_output=True, timeout=30, text=True,
+    )
+    if res.returncode != 0 or not out.exists() or out.stat().st_size == 0:
+        out.unlink(missing_ok=True)
+        raise RuntimeError(
+            f"grim region failed (rc={res.returncode}): {res.stderr.strip()}"
+        )
+    return out
+
+
 # ============================================================================
-# Region picker (flameshot-style overlay)
+# Region picker (flameshot-style overlay — fallback when no native backend)
 # ============================================================================
 
 def pick_region_from(pixmap, qt) -> "object | None":
@@ -325,6 +407,34 @@ def _load_qt() -> dict:
         QWidget,
     )
     return locals()
+
+
+def _qt_chord_to_gsettings(text: str) -> str | None:
+    """Convert a Qt PortableText keychord (e.g. "Ctrl+Shift+S") to GNOME's
+    gsettings binding format (e.g. "<Primary><Shift>s"). Returns None if the
+    chord has no key part."""
+    if not text:
+        return None
+    parts = [p.strip() for p in text.split("+") if p.strip()]
+    if not parts:
+        return None
+    *mod_parts, key = parts
+    mod_map = {
+        "ctrl": "<Primary>", "control": "<Primary>",
+        "shift": "<Shift>",
+        "alt": "<Alt>",
+        "meta": "<Super>", "super": "<Super>",
+    }
+    mods = []
+    for m in mod_parts:
+        gs = mod_map.get(m.lower())
+        if gs and gs not in mods:
+            mods.append(gs)
+    # Single letters use lowercase in gsettings convention; named keys
+    # (Print, F1, Return, Space, Tab…) stay verbatim.
+    if len(key) == 1 and key.isalpha():
+        key = key.lower()
+    return "".join(mods) + key
 
 
 def _show_error_dialog(title: str, message: str) -> None:
@@ -1949,11 +2059,15 @@ def run_app(initial_image: Path | None, autostart_capture: str | None,
         # ---- global keyboard shortcut ----
         def setup_global_shortcut(self):
             """Register a GNOME system-wide shortcut so Yaz works from any app."""
+            # Sentinel value triggers the custom-chord recorder below.
+            CUSTOM = object()
             options = {
+                "Shift+Print  (GNOME area-screenshot key)": "<Shift>Print",
                 "Ctrl+Shift+Print": "<Primary><Shift>Print",
                 "Super+Shift+S": "<Super><Shift>s",
                 "Ctrl+Alt+S": "<Primary><Alt>s",
                 "Ctrl+Print": "<Primary>Print",
+                "Custom…  (record your own keys)": CUSTOM,
             }
             choice, ok = QInputDialog.getItem(
                 self, "Yaz — Global shortcut",
@@ -1965,6 +2079,12 @@ def run_app(initial_image: Path | None, autostart_capture: str | None,
             if not ok:
                 return
             binding = options[choice]
+            if binding is CUSTOM:
+                custom = self._prompt_custom_binding()
+                if not custom:
+                    return
+                pretty, binding = custom
+                choice = pretty
             mode_choice, ok2 = QInputDialog.getItem(
                 self, "Yaz — Global shortcut action",
                 "What should the shortcut do?",
@@ -2003,6 +2123,56 @@ def run_app(initial_image: Path | None, autostart_capture: str | None,
                 f"<i>{mode_choice}</i>.</p>"
             )
             mbox.exec()
+
+        def _prompt_custom_binding(self):
+            """Open a key-capture dialog and return ``(pretty, gsettings)`` or
+            ``None`` if the user cancels or doesn't enter a usable chord.
+
+            The pretty string is shown back to the user (e.g. "Ctrl+Shift+P");
+            the gsettings string is what we hand to ``gsettings set …
+            binding`` (e.g. "<Primary><Shift>p")."""
+            from PyQt6.QtWidgets import QKeySequenceEdit
+
+            dlg = QDialog(self)
+            dlg.setWindowTitle("Yaz — Custom shortcut")
+            dlg.resize(420, 0)
+            layout = QVBoxLayout(dlg)
+            layout.addWidget(QLabel(
+                "Press the key combination you want to use as the "
+                "system-wide shortcut, then click OK."
+            ))
+            edit = QKeySequenceEdit(dlg)
+            layout.addWidget(edit)
+            hint = QLabel(
+                "Tip: include at least one modifier (Ctrl / Shift / Alt / "
+                "Super) so it doesn't fire while you're typing."
+            )
+            hint.setStyleSheet("color: #888; font-size: 9pt;")
+            hint.setWordWrap(True)
+            layout.addWidget(hint)
+            btns = QDialogButtonBox(
+                QDialogButtonBox.StandardButton.Ok
+                | QDialogButtonBox.StandardButton.Cancel
+            )
+            btns.accepted.connect(dlg.accept)
+            btns.rejected.connect(dlg.reject)
+            layout.addWidget(btns)
+            if dlg.exec() != QDialog.DialogCode.Accepted:
+                return None
+            seq = edit.keySequence()
+            if seq.isEmpty():
+                return None
+            pretty = seq.toString(QKeySequence.SequenceFormat.NativeText)
+            portable = seq.toString(QKeySequence.SequenceFormat.PortableText)
+            gs = _qt_chord_to_gsettings(portable)
+            if not gs:
+                QMessageBox.warning(
+                    self, "Yaz",
+                    "That key combination couldn't be converted to a "
+                    "system shortcut. Try a different one."
+                )
+                return None
+            return pretty, gs
 
         def _install_gnome_shortcut(self, binding: str, command: str):
             base = "org.gnome.settings-daemon.plugins.media-keys"
@@ -2188,6 +2358,32 @@ def run_app(initial_image: Path | None, autostart_capture: str | None,
                 # Brief pause so the minimize is actually painted before we
                 # ask the screen for a screenshot.
                 time.sleep(0.2)
+
+            # Region mode: prefer the OS-native interactive area selector so
+            # the user drags on the *live* screen before any capture is taken
+            # (gnome-screenshot -a, or slurp+grim on wlroots). Fall back to
+            # the full-capture-then-overlay path only if no native backend is
+            # available or it fails for an unexpected reason.
+            if mode == "region":
+                try:
+                    region_path = capture_region_native()
+                except CaptureCancelled:
+                    self._restore()
+                    return
+                except Exception:  # noqa: BLE001
+                    import traceback; traceback.print_exc()
+                    region_path = None
+                if region_path is not None:
+                    pixmap = QPixmap(str(region_path))
+                    if pixmap.isNull():
+                        self._restore()
+                        QMessageBox.warning(
+                            self, "Yaz",
+                            f"Captured image is empty: {region_path}")
+                        return
+                    self.load_pixmap(pixmap, source_path=None)
+                    self._restore()
+                    return
 
             try:
                 path = capture_full_screen()
