@@ -7,9 +7,14 @@ export DEB_BUILD_OPTIONS = nocheck
 	dh $@
 
 override_dh_auto_install:
-	# Install yaz.py into /usr/lib/yaz/
+	# Install yaz.py + every yaz_*.py module into /usr/lib/yaz/ (flat).
+	# Sources live under src/ grouped by role; we flatten them so the
+	# sibling imports keep working without the dev-only sys.path shim.
 	install -d $(CURDIR)/debian/yaz/usr/lib/yaz
 	install -m 0644 yaz.py $(CURDIR)/debian/yaz/usr/lib/yaz/yaz.py
+	for f in src/yaz_*.py src/*/yaz_*.py; do \
+	    install -m 0644 "$$f" $(CURDIR)/debian/yaz/usr/lib/yaz/$$(basename "$$f"); \
+	done
 
 	# Install launcher into /usr/bin/yaz
 	install -d $(CURDIR)/debian/yaz/usr/bin

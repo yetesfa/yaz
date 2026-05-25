@@ -22,9 +22,11 @@ mkdir -p \
     "$BUILD/usr/share/metainfo"
 
 # --- payload ---
-# yaz.py is the entry; yaz_*.py modules are imported as siblings.
+# yaz.py is the entry; yaz_*.py modules live under src/ (grouped by role)
+# but get flattened into /usr/lib/yaz/ at install time so the sibling
+# imports work without the dev-only sys.path bootstrap.
 install -m 0644 "$ROOT/yaz.py" "$BUILD/usr/lib/yaz/yaz.py"
-for mod in "$ROOT"/yaz_*.py; do
+for mod in "$ROOT"/src/yaz_*.py "$ROOT"/src/*/yaz_*.py; do
     install -m 0644 "$mod" "$BUILD/usr/lib/yaz/$(basename "$mod")"
 done
 cat > "$BUILD/usr/bin/yaz" <<'EOF'

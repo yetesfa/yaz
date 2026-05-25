@@ -58,10 +58,11 @@ parts:
     override-build: |
       craftctl default
       # Install the launcher + yaz.py + sibling yaz_*.py modules into
-      # snap's bin/lib layout.
+      # snap's bin/lib layout. Sources live under src/ (grouped by role)
+      # but get flattened into lib/yaz/ so sibling imports just work.
       install -Dm 0755 "${CRAFT_PROJECT_DIR}/yaz" "${CRAFT_PART_INSTALL}/bin/yaz-launcher"
       install -Dm 0644 "${CRAFT_PROJECT_DIR}/yaz.py" "${CRAFT_PART_INSTALL}/lib/yaz/yaz.py"
-      for mod in "${CRAFT_PROJECT_DIR}"/yaz_*.py; do
+      for mod in "${CRAFT_PROJECT_DIR}"/src/yaz_*.py "${CRAFT_PROJECT_DIR}"/src/*/yaz_*.py; do
           install -Dm 0644 "$mod" "${CRAFT_PART_INSTALL}/lib/yaz/$(basename "$mod")"
       done
       cat > "${CRAFT_PART_INSTALL}/bin/yaz" <<'EOF'

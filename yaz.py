@@ -22,19 +22,29 @@ CLI:
     yaz --open FILE     open an existing image for annotation
     yaz --delay N       wait N seconds before capturing
 
-Source code is split across sibling modules:
-    yaz_capture.py      capture backends (no Qt)
-    yaz_settings.py     DEFAULTS + screen helpers (no Qt)
-    yaz_picker.py       fullscreen region overlay
-    yaz_canvas.py       annotation canvas + undo commands
-    yaz_welcome.py      welcome / launcher screen
-    yaz_preferences.py  preferences dialog
-    yaz_countdown.py    delayed-capture countdown overlay
-    yaz_mw_*.py         MainWindow mixins (chrome / drawing / fileio /
-                        capture / shortcuts / dialogs)
-    yaz_mainwindow.py   QMainWindow assembling the mixins
-    yaz_app.py          QApplication orchestrator
-    yaz.py              this file — CLI entry only
+Source code lives under src/, grouped by role. Filenames keep the yaz_
+prefix; sibling-style imports still work because the sys.path bootstrap
+below puts every src/ subfolder on the import path.
+
+    src/yaz_app.py           QApplication orchestrator
+    src/yaz_mainwindow.py    QMainWindow assembling the mixins
+    src/yaz_settings.py      DEFAULTS + screen helpers (no Qt)
+    src/capture/
+        yaz_capture.py       capture backends (no Qt)
+        yaz_picker.py        fullscreen region overlay
+        yaz_countdown.py     delayed-capture countdown overlay
+    src/ui/
+        yaz_canvas.py        annotation canvas + undo commands
+        yaz_welcome.py       welcome / launcher screen
+        yaz_preferences.py   preferences dialog
+    src/mixins/
+        yaz_mw_*.py          MainWindow mixins (chrome / drawing /
+                             fileio / capture / shortcuts / dialogs)
+    yaz.py                   this file — CLI entry only
+
+Installed builds (.deb / snap) flatten everything into /usr/lib/yaz/, so
+the sys.path bootstrap is guarded with `if _SRC.is_dir():` — it's a
+no-op when src/ doesn't exist alongside this file.
 
 Source:     https://github.com/yetesfa/yaz
 Issues:     https://github.com/yetesfa/yaz/issues
@@ -47,6 +57,16 @@ import argparse
 import subprocess
 import sys
 from pathlib import Path
+
+# Module discovery for dev runs: src/ and its role subfolders sit on
+# sys.path so the existing flat sibling imports (e.g. `from yaz_settings
+# import ...`, `from yaz_mw_capture import ...`) resolve regardless of
+# which subfolder the module file lives in. Skipped when src/ is absent
+# (i.e. in installed builds, where everything is already in one dir).
+_SRC = Path(__file__).resolve().parent / "src"
+if _SRC.is_dir():
+    for _sub in (_SRC, _SRC / "capture", _SRC / "ui", _SRC / "mixins"):
+        sys.path.insert(0, str(_sub))
 
 
 def _show_error_dialog(title: str, message: str) -> None:

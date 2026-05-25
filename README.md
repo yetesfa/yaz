@@ -322,18 +322,40 @@ model, position, DPR, refresh rate).
 
 ### Architecture
 
-Single file (`yaz.py`, ~2400 lines) organised as:
+`yaz.py` at the project root is the CLI entry — it parses arguments
+without importing Qt (so `--help` works on machines without PyQt6) and
+then hands off to `yaz_app.run_app()`. Everything else lives under
+`src/`, grouped by role:
 
-1. **Capture backends** — `gnome-screenshot`, `grim`, portal via `Gio`
-2. **Region picker** — fullscreen dimmed overlay with crosshair drag
-3. **`run_app()`** — main entry; defines all Qt classes as nested
-   classes so PyQt6 is imported only after the portal mainloop is done
-   (the portal call uses GLib's mainloop, which mustn't conflict with
-   Qt's)
-4. **Helpers** — `friendly_screen_name`, `describe_screen`, defaults
+```
+yaz.py                       CLI entry (Qt-free until args parsed)
+src/
+├── yaz_app.py               QApplication orchestrator
+├── yaz_mainwindow.py        QMainWindow assembled from mixins
+├── yaz_settings.py          DEFAULTS, QSettings helpers, screen helpers
+├── capture/
+│   ├── yaz_capture.py       Backends: gnome-screenshot / grim / portal
+│   ├── yaz_picker.py        Fullscreen dimmed region-picker overlay
+│   └── yaz_countdown.py     Delayed-capture countdown overlay
+├── ui/
+│   ├── yaz_canvas.py        Annotation canvas + QUndoStack commands
+│   ├── yaz_welcome.py       Welcome / launcher screen
+│   └── yaz_preferences.py   Preferences dialog
+└── mixins/                  MainWindow capabilities, mixed into one class
+    ├── yaz_mw_chrome.py     Menus, toolbars, status bar
+    ├── yaz_mw_drawing.py    Tool selection, colour/width state
+    ├── yaz_mw_capture.py    Region / full / per-monitor capture flow
+    ├── yaz_mw_fileio.py     Save, copy, open, paste
+    ├── yaz_mw_shortcuts.py  Global shortcut wizard
+    └── yaz_mw_dialogs.py    Common dialogs (about, errors, etc.)
+```
 
-The Qt classes are intentionally inline (not split into modules) to keep
-forking easy — clone the file, hack on it, run.
+Filenames keep the flat `yaz_` prefix on purpose: `yaz.py` adds the
+`src/` subfolders to `sys.path` at startup, so every module imports its
+siblings by name (`from yaz_settings import ...`) regardless of which
+subfolder it lives in. Installed builds (`.deb` / snap) flatten
+everything back into `/usr/lib/yaz/`, so the same imports keep working
+without the dev-only path shim.
 
 ---
 
