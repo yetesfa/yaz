@@ -22,7 +22,11 @@ mkdir -p \
     "$BUILD/usr/share/metainfo"
 
 # --- payload ---
+# yaz.py is the entry; yaz_*.py modules are imported as siblings.
 install -m 0644 "$ROOT/yaz.py" "$BUILD/usr/lib/yaz/yaz.py"
+for mod in "$ROOT"/yaz_*.py; do
+    install -m 0644 "$mod" "$BUILD/usr/lib/yaz/$(basename "$mod")"
+done
 cat > "$BUILD/usr/bin/yaz" <<'EOF'
 #!/usr/bin/env bash
 exec /usr/bin/python3 /usr/lib/yaz/yaz.py "$@"
