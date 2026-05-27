@@ -1,7 +1,7 @@
 Source: yaz
 Section: graphics
 Priority: optional
-Maintainer: Yetesfa Alemayehu <noreply@example.com>
+Maintainer: Yetesfa Alemayehu <yetesfadev@gmail.com>
 Build-Depends: debhelper-compat (= 13), dh-python, python3-all, python3-setuptools
 Standards-Version: 4.6.2
 Homepage: https://github.com/yetesfa/yaz

@@ -56,7 +56,7 @@ Architecture: $ARCH
 Installed-Size: $INSTALLED_SIZE
 Depends: python3 (>= 3.10), python3-pyqt6, python3-gi, gnome-screenshot, wl-clipboard
 Recommends: grim, slurp
-Maintainer: Yetesfa Alemayehu <noreply@example.com>
+Maintainer: Yetesfa Alemayehu <yetesfadev@gmail.com>
 Homepage: https://github.com/yetesfa/yaz
 Description: Wayland-native screenshot and annotation tool
  Yaz captures and annotates screenshots on Linux. Designed for GNOME
