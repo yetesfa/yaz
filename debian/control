@@ -1,4 +1,4 @@
-Source: yaz
+Source: yaz-screenshot
 Section: graphics
 Priority: optional
 Maintainer: Yetesfa Alemayehu <yetesfadev@gmail.com>
@@ -9,7 +9,7 @@ Vcs-Browser: https://github.com/yetesfa/yaz
 Vcs-Git: https://github.com/yetesfa/yaz.git
 Rules-Requires-Root: no
 
-Package: yaz
+Package: yaz-screenshot
 Architecture: all
 Depends: ${python3:Depends}, ${misc:Depends},
          python3 (>= 3.10),

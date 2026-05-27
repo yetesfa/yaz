@@ -1,4 +1,4 @@
-name: yaz
+name: yaz-screenshot
 title: Yaz
 version: '0.1.0'
 summary: Wayland-native screenshot and annotation tool

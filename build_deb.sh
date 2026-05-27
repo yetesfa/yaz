@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Build a Debian package (.deb) for Yaz.
 #
-# Output: yaz_<VERSION>_all.deb in the project root.
-# Install with:    sudo apt install ./yaz_<VERSION>_all.deb
-#         or:     sudo dpkg -i yaz_<VERSION>_all.deb && sudo apt -f install
+# Output: yaz-screenshot_<VERSION>_all.deb in the project root.
+# Install with:    sudo apt install ./yaz-screenshot_<VERSION>_all.deb
+#         or:     sudo dpkg -i yaz-screenshot_<VERSION>_all.deb && sudo apt -f install
 set -euo pipefail
 
 VERSION="${1:-0.1.0}"
 ARCH="all"
-PKG="yaz_${VERSION}_${ARCH}"
+PKG="yaz-screenshot_${VERSION}_${ARCH}"
 ROOT="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
 BUILD="$(mktemp -d)/$PKG"
 
@@ -18,7 +18,7 @@ mkdir -p \
     "$BUILD/usr/lib/yaz" \
     "$BUILD/usr/bin" \
     "$BUILD/usr/share/applications" \
-    "$BUILD/usr/share/doc/yaz" \
+    "$BUILD/usr/share/doc/yaz-screenshot" \
     "$BUILD/usr/share/metainfo"
 
 # --- payload ---
@@ -40,15 +40,15 @@ sed 's|@PREFIX@/yaz|/usr/bin/yaz|g' "$ROOT/yaz.desktop.in" \
     > "$BUILD/usr/share/applications/yaz.desktop"
 
 # Docs.
-install -m 0644 "$ROOT/README.md"  "$BUILD/usr/share/doc/yaz/"
-install -m 0644 "$ROOT/LICENSE"    "$BUILD/usr/share/doc/yaz/copyright"
+install -m 0644 "$ROOT/README.md"  "$BUILD/usr/share/doc/yaz-screenshot/"
+install -m 0644 "$ROOT/LICENSE"    "$BUILD/usr/share/doc/yaz-screenshot/copyright"
 
 # Compute installed-size in KiB (apt shows this).
 INSTALLED_SIZE=$(du -sk "$BUILD/usr" | cut -f1)
 
 # --- control metadata ---
 cat > "$BUILD/DEBIAN/control" <<EOF
-Package: yaz
+Package: yaz-screenshot
 Version: $VERSION
 Section: graphics
 Priority: optional

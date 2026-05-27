@@ -33,3 +33,11 @@ yaz.desktop
 yaz_*_source.changes
 yaz_*.tar.gz
 yaz_*.dsc
+yaz-screenshot_*_source.changes
+yaz-screenshot_*_source.buildinfo
+yaz-screenshot_*.tar.gz
+yaz-screenshot_*.dsc
+yaz-screenshot_*.buildinfo
+
+# dpkg-buildpackage auto-generated, regenerated each build
+debian/files

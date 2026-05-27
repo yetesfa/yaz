@@ -1,6 +1,8 @@
-yaz (0.1.0-1) noble; urgency=medium
+yaz-screenshot (0.1.0) noble; urgency=medium
 
-  * Initial release.
+  * Initial release (renamed from "yaz" to "yaz-screenshot" to avoid the
+    namespace collision with Index Data's existing YAZ Z39.50 toolkit
+    in Ubuntu universe). The runtime command is still `yaz`.
   * Wayland-native screenshot capture (gnome-screenshot / grim / portal).
   * Annotation editor: rect, ellipse, arrow, line, pen, highlight, text, blur.
   * Full undo/redo for add, delete, move, crop.
@@ -9,4 +11,4 @@ yaz (0.1.0-1) noble; urgency=medium
   * Multi-monitor aware with correct fractional-scaling crop math.
   * Global keyboard-shortcut setup via gsettings.
 
- -- Yetesfa Alemayehu <yetesfadev@gmail.com>  Thu, 14 May 2026 17:00:00 +0300
+ -- Yetesfa Alemayehu <yetesfadev@gmail.com>  Wed, 27 May 2026 12:50:00 +0300

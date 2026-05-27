@@ -46,25 +46,31 @@ external display.
 ### Option A — Direct `.deb` (Ubuntu / Debian / Pop!_OS)
 
 ```bash
-wget https://github.com/yetesfa/yaz/releases/latest/download/yaz_0.1.0_all.deb
-sudo apt install ./yaz_0.1.0_all.deb
+wget https://github.com/yetesfa/yaz/releases/latest/download/yaz-screenshot_0.1.0_all.deb
+sudo apt install ./yaz-screenshot_0.1.0_all.deb
 ```
 
-The `.deb` is ≈26 KB and pulls in `python3-pyqt6`, `python3-gi`,
-`gnome-screenshot`, and `wl-clipboard` automatically.
+The `.deb` is ≈30 KB and pulls in `python3-pyqt6`, `python3-gi`,
+`gnome-screenshot`, and `wl-clipboard` automatically. Run with `yaz`
+from any terminal once installed.
 
-### Option B — `apt install` via Launchpad PPA *(coming soon)*
+### Option B — `apt install` via Launchpad PPA
 
 ```bash
 sudo add-apt-repository ppa:yetesfa/yaz
 sudo apt update
-sudo apt install yaz
+sudo apt install yaz-screenshot
 ```
+
+> The package is named `yaz-screenshot` (not `yaz`) because Ubuntu's
+> `universe` repo already has a different package called `yaz` (Index
+> Data's Z39.50 library toolkit). The command you type to run the app
+> is still `yaz`.
 
 ### Option C — Snap (Ubuntu App Center) *(coming soon)*
 
 ```bash
-sudo snap install yaz
+sudo snap install yaz-screenshot
 ```
 
 ### Option D — From source
