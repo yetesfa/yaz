@@ -1,3 +1,12 @@
+yaz-screenshot (0.1.1) noble; urgency=medium
+
+  * Fix empty .deb: debian/rules was staging files under debian/yaz/
+    (the old binary-package name) while debian/control declares the
+    binary as yaz-screenshot, so debhelper assembled the .deb from an
+    empty debian/yaz-screenshot/ tree. Renamed the staging prefix.
+
+ -- Yetesfa Alemayehu <yetesfadev@gmail.com>  Wed, 27 May 2026 14:30:00 +0300
+
 yaz-screenshot (0.1.0) noble; urgency=medium
 
   * Initial release (renamed from "yaz" to "yaz-screenshot" to avoid the

@@ -10,19 +10,19 @@ override_dh_auto_install:
 	# Install yaz.py + every yaz_*.py module into /usr/lib/yaz/ (flat).
 	# Sources live under src/ grouped by role; we flatten them so the
 	# sibling imports keep working without the dev-only sys.path shim.
-	install -d $(CURDIR)/debian/yaz/usr/lib/yaz
-	install -m 0644 yaz.py $(CURDIR)/debian/yaz/usr/lib/yaz/yaz.py
+	install -d $(CURDIR)/debian/yaz-screenshot/usr/lib/yaz
+	install -m 0644 yaz.py $(CURDIR)/debian/yaz-screenshot/usr/lib/yaz/yaz.py
 	for f in src/yaz_*.py src/*/yaz_*.py; do \
-	    install -m 0644 "$$f" $(CURDIR)/debian/yaz/usr/lib/yaz/$$(basename "$$f"); \
+	    install -m 0644 "$$f" $(CURDIR)/debian/yaz-screenshot/usr/lib/yaz/$$(basename "$$f"); \
 	done
 
 	# Install launcher into /usr/bin/yaz
-	install -d $(CURDIR)/debian/yaz/usr/bin
+	install -d $(CURDIR)/debian/yaz-screenshot/usr/bin
 	printf '#!/bin/sh\nexec /usr/bin/python3 /usr/lib/yaz/yaz.py "$$@"\n' \
-	    > $(CURDIR)/debian/yaz/usr/bin/yaz
-	chmod 0755 $(CURDIR)/debian/yaz/usr/bin/yaz
+	    > $(CURDIR)/debian/yaz-screenshot/usr/bin/yaz
+	chmod 0755 $(CURDIR)/debian/yaz-screenshot/usr/bin/yaz
 
 	# Install desktop file
-	install -d $(CURDIR)/debian/yaz/usr/share/applications
+	install -d $(CURDIR)/debian/yaz-screenshot/usr/share/applications
 	sed 's|@PREFIX@/yaz|/usr/bin/yaz|g' yaz.desktop.in \
-	    > $(CURDIR)/debian/yaz/usr/share/applications/yaz.desktop
+	    > $(CURDIR)/debian/yaz-screenshot/usr/share/applications/yaz.desktop

@@ -46,8 +46,8 @@ external display.
 ### Option A — Direct `.deb` (Ubuntu / Debian / Pop!_OS)
 
 ```bash
-wget https://github.com/yetesfa/yaz/releases/latest/download/yaz-screenshot_0.1.0_all.deb
-sudo apt install ./yaz-screenshot_0.1.0_all.deb
+wget https://github.com/yetesfa/yaz/releases/latest/download/yaz-screenshot_0.1.1_all.deb
+sudo apt install ./yaz-screenshot_0.1.1_all.deb
 ```
 
 The `.deb` is ≈30 KB and pulls in `python3-pyqt6`, `python3-gi`,

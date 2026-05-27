@@ -13,33 +13,33 @@ Three ways users can install Yaz, ordered by how much work *you* have to do:
 ### Build it
 
 ```bash
-./build_deb.sh 0.1.0
+./build_deb.sh 0.1.1
 ```
 
-You'll get `yaz_0.1.0_all.deb` in the project root (≈26 KB).
+You'll get `yaz-screenshot_0.1.1_all.deb` in the project root (≈29 KB).
 
 ### Test it locally
 
 ```bash
-sudo apt install ./yaz_0.1.0_all.deb       # apt resolves the python3-pyqt6 etc deps
+sudo apt install ./yaz-screenshot_0.1.1_all.deb       # apt resolves the python3-pyqt6 etc deps
 # or
-sudo dpkg -i yaz_0.1.0_all.deb && sudo apt -f install
+sudo dpkg -i yaz-screenshot_0.1.1_all.deb && sudo apt -f install
 ```
 
-To uninstall: `sudo apt remove yaz`.
+To uninstall: `sudo apt remove yaz-screenshot`.
 
 ### Publish
 
 1. Go to your GitHub repo → **Releases** → **Draft a new release**.
-2. Tag: `v0.1.0`, title: `Yaz 0.1.0`.
+2. Tag: `v0.1.1`, title: `Yaz 0.1.1`.
 3. Drag the `.deb` into the assets area.
 4. Publish.
 
 Users then install with:
 
 ```bash
-wget https://github.com/yetesfa/yaz/releases/download/v0.1.0/yaz_0.1.0_all.deb
-sudo apt install ./yaz_0.1.0_all.deb
+wget https://github.com/yetesfa/yaz/releases/download/v0.1.1/yaz-screenshot_0.1.1_all.deb
+sudo apt install ./yaz-screenshot_0.1.1_all.deb
 ```
 
 The package also ships AppStream metadata, so it appears in **GNOME Software**
@@ -48,14 +48,14 @@ repo).
 
 ---
 
-## 2. Launchpad PPA — `apt install yaz` for everyone
+## 2. Launchpad PPA — `apt install yaz-screenshot` for everyone
 
 This is what lets users do:
 
 ```bash
 sudo add-apt-repository ppa:yetesfa/yaz
 sudo apt update
-sudo apt install yaz
+sudo apt install yaz-screenshot
 ```
 
 ### One-time setup (≈1 hour, only you do this)
@@ -98,10 +98,10 @@ sudo apt install yaz
 debuild -S -sa
 
 # 2. Files appear one directory up:
-ls ../yaz_0.1.0*
+ls ../yaz-screenshot_0.1.1*
 
 # 3. Upload to your PPA
-dput ppa:yetesfa/yaz ../yaz_0.1.0_source.changes
+dput ppa:yetesfa/yaz ../yaz-screenshot_0.1.1_source.changes
 ```
 
 Launchpad will email you when the build succeeds (≈10–30 min). After that,
@@ -110,7 +110,7 @@ anyone can:
 ```bash
 sudo add-apt-repository ppa:yetesfa/yaz
 sudo apt update
-sudo apt install yaz
+sudo apt install yaz-screenshot
 ```
 
 Future updates: bump the version in `debian/changelog` (`dch -i`) and rerun
@@ -127,8 +127,8 @@ Visible to every Ubuntu 24.04+ user in the **App Center** when they search.
 ```bash
 sudo snap install snapcraft --classic
 snapcraft
-# Produces yaz_0.1.0_amd64.snap
-sudo snap install --dangerous ./yaz_0.1.0_amd64.snap   # test before publishing
+# Produces yaz-screenshot_0.1.1_amd64.snap
+sudo snap install --dangerous ./yaz-screenshot_0.1.1_amd64.snap   # test before publishing
 ```
 
 ### Publish to the store
@@ -138,20 +138,20 @@ sudo snap install --dangerous ./yaz_0.1.0_amd64.snap   # test before publishing
 
    ```bash
    snapcraft login
-   snapcraft register yaz       # claims "yaz" forever — or pick yaz-screenshot
+   snapcraft register yaz-screenshot   # matches the .deb / PPA name; "yaz" is taken upstream
    ```
 
 3. Upload + release:
 
    ```bash
-   snapcraft upload --release=stable yaz_0.1.0_amd64.snap
+   snapcraft upload --release=stable yaz-screenshot_0.1.1_amd64.snap
    ```
 
 4. Canonical reviews snaps that need the `personal-files` plug (Yaz needs
    it to write `~/.config/Yaz/`). Expect a 1–2 day automated/manual review
    — answer any questions on the review thread.
 
-5. Once approved, it shows up in `snap find yaz` and Ubuntu App Center.
+5. Once approved, it shows up in `snap find yaz-screenshot` and Ubuntu App Center.
 
 ### Caveat: snap sandboxing
 
@@ -194,11 +194,11 @@ Now your README's install matrix can say:
 
 ```bash
 # Option A — direct .deb
-wget …yaz_0.1.0_all.deb && sudo apt install ./yaz_0.1.0_all.deb
+wget …yaz-screenshot_0.1.1_all.deb && sudo apt install ./yaz-screenshot_0.1.1_all.deb
 
 # Option B — PPA
-sudo add-apt-repository ppa:yetesfa/yaz && sudo apt install yaz
+sudo add-apt-repository ppa:yetesfa/yaz && sudo apt install yaz-screenshot
 
 # Option C — snap
-sudo snap install yaz
+sudo snap install yaz-screenshot
 ```
